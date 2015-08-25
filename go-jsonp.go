@@ -13,14 +13,13 @@ func GetStringFromJsonpString(str string) string {
 	excepted := exceptCallback.FindAllStringSubmatch(str, -1)[0][1]
 
 	return jsonize.ReplaceAllString(excepted, "\"${1}\":${2}")
-
 }
 
-func GetStringFromURL(url string) string {
+func GetStringFromURL(url string) (string, error) {
 	resp, err := http.Get(url)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 	body, err := ioutil.ReadAll(resp.Body)
 
@@ -31,5 +30,5 @@ func GetStringFromURL(url string) string {
 	defer resp.Body.Close()
 	str := string(body)
 
-	return GetStringFromJsonpString(str)
+	return GetStringFromJsonpString(str), nil
 }
