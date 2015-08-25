@@ -9,13 +9,15 @@ import (
 var exceptCallback = regexp.MustCompile(`callback\((.*)\)`)
 var jsonize = regexp.MustCompile("([0-9a-zA-Z]*):([0-9a-zA-Z]*)")
 
-func GetStringFromJsonpString(str string) string {
+// GetJSONFromJSONP is function that convert Json string from Jsonp string
+func GetJSONFromJSONP(str string) string {
 	excepted := exceptCallback.FindAllStringSubmatch(str, -1)[0][1]
 
 	return jsonize.ReplaceAllString(excepted, "\"${1}\":${2}")
 }
 
-func GetStringFromURL(url string) (string, error) {
+// GetJSONFromURL is function that convert Json string from Jsonp url
+func GetJSONFromURL(url string) (string, error) {
 	resp, err := http.Get(url)
 
 	if err != nil {
@@ -24,11 +26,11 @@ func GetStringFromURL(url string) (string, error) {
 	body, err := ioutil.ReadAll(resp.Body)
 
 	if err != nil {
-		panic(err)
+		return "", err
 	}
 
 	defer resp.Body.Close()
 	str := string(body)
 
-	return GetStringFromJsonpString(str), nil
+	return GetJSONFromJSONP(str), nil
 }
